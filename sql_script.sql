@@ -1,3 +1,5 @@
+CREATE SCHEMA my_schema;
+
 CREATE TABLE my_schema.converterappuser
 {
  id            SERIAL PRIMARY KEY NOT NULL,
