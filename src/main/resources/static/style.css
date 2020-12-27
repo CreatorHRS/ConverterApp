@@ -1,0 +1,117 @@
+header{
+    display: flex;
+    flex-wrap: nowrap;
+    height: 100px;
+    background-color: #ffffff;
+    
+    page-break-inside: auto;
+    padding-left: 10%;
+    padding-right: 10%;
+    box-shadow: 0 4px 8px 0 rgba(189, 189, 189, 0.2), 0 6px 20px 0 rgba(141, 141, 141, 0.2);
+   
+    
+}
+
+#main-menu{
+    margin-left: auto;
+    
+    display: flex;
+    
+}
+#main-menu div{
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 26px;
+    padding-top: 30px;
+    height: 30%;
+    font-weight: 600;
+}
+#main-menu > div > a{
+    color: #111111;
+    
+}
+#name{
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 26px;
+    padding-top: 30px;
+    height: 30%;
+    font-weight: 600;
+}
+
+#main-menu div:hover{
+    background-color: #4383ae;
+    transition: 0.5s;
+    
+}
+#main-menu div:hover a{
+    color: white;
+    transition: 0.5s;
+}
+
+.Curency{
+    margin: 0 auto;
+    
+    display: flex;
+    padding-top: 30px;
+   
+}
+
+.ChangerCurency{
+    margin: 0 auto;
+    padding-left: 10px;
+    padding-right: 10px;
+    
+   
+}
+
+.ChangerCurencySelect{
+    width: 100px; 
+}
+.ChangerCurencyInput{
+    width: 100px;
+}
+#subbut{
+    margin: 0 auto;
+    width: 200px;
+    height: 50px;
+}
+#form{
+    margin-top: 50px;
+    margin-left: 35%;
+    margin-right: 35%;
+    padding: 30px;
+    background-color:rgba(37, 92, 194, 0.404);
+}
+
+.result{
+	color: red;
+	margin: 0 auto;
+}
+
+.historyEntry
+{
+    margin: 0 auto;
+    background-color: rgb(142, 175, 236);
+    margin-top: 10px;
+    display: flex;
+}
+.history
+{
+    margin-right: 30%;
+    margin-left: 30%;
+}
+.historyEntry > p
+{
+    margin-right: 10px;
+    margin-left: 10px;
+    
+   
+}
+
+#dateForm
+{
+    margin: 10px;
+    background-color: rgb(140, 164, 209);
+    padding: 10px;
+}

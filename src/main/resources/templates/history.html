@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <header>
+
+        <div id="name" th:text="'Имя пользователя: ' + ${name}" />
+        <div id="main-menu">
+
+
+            <div><a href="/main">Главная</a></div>
+            <div><a href="/history">История</a></div>
+            <div><a href="/logout">Выйдти</a></div>
+        </div>
+    </header>
+
+
+    <div class="history">
+    
+    	<form action="/history_by_date" method="GET" id="dateForm">
+            <p>Выберите дату</p>
+            <input type="date" name="sort_date">
+            <button type="submit">Сортировать</button>
+        </form>
+        <div class="historyEntry" th:each="historyEntry : ${history}">
+            
+            <p>конвертация:</p>
+            <p th:text="${historyEntry.fromValue} + ' ' + ${historyEntry.fromCharCode}"></p>
+            <p>-</p>
+            <p th:text="${historyEntry.toValue} + ' ' + ${historyEntry.toCharCode}"></p>
+            <p></p>
+            <p th:text="${historyEntry.date} + ' ' + ${historyEntry.time}"></p>
+        </div>
+
+    </div>
+</body>
+
+
+</html>
