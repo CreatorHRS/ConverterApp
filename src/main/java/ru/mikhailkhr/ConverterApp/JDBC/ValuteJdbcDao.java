@@ -1,9 +1,11 @@
 package ru.mikhailkhr.ConverterApp.JDBC;
 
+import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -11,13 +13,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import ru.mikhailkhr.ConverterApp.entity.Valute;
 
 /**
- * Vlute calss that interact with database
+ * Valute calss that interact with database
  * @author mikhailkhr
  *
  */
@@ -25,7 +28,7 @@ import ru.mikhailkhr.ConverterApp.entity.Valute;
 public class ValuteJdbcDao {
 
 	private final String INSERT_SQL = "INSERT INTO my_schema.valute (name, numCode, charCode, valute_value, nominal, date) VALUES (?, ?, ?, ?, ?, ?);";
-	private final String SELECT_ALL_VALUTES_BY_DATE = "SELECT * FROM my_schema.valute WHERE date = '%s'";
+	private final String SELECT_ALL_VALUTES_BY_DATE = "SELECT * FROM my_schema.valute WHERE date = ?";
 	/*
 	 * Standard sql database formatter
 	 */
@@ -67,24 +70,36 @@ public class ValuteJdbcDao {
 	 * @return list of found valutes
 	 */
 	public List<Valute> getAllValuteByDate(LocalDate date) {
-		String dateStr = date.format(postresFormatter);
-		List<Valute> valutes = jdbcTemplate.query(
-				String.format(SELECT_ALL_VALUTES_BY_DATE, date.format(postresFormatter)), new RowMapper<Valute>() {
+		/*
+		 * Processing from SQL Injection 
+		 */
+		PreparedStatementCreator selectValutesPSCreator = new PreparedStatementCreator() {
+			
+			@Override
+			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+				PreparedStatement ps = con.prepareStatement(SELECT_ALL_VALUTES_BY_DATE, Statement.RETURN_GENERATED_KEYS);
+				ps.setDate(1, Date.valueOf(date));
+				return ps;
+			}
+		};
+		
+		RowMapper<Valute> selectValutesRowMapper = new RowMapper<Valute>() {
+			@Override
+			public Valute mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Valute valute = new Valute();
+				valute.setId(String.valueOf(rs.getInt("id")));
+				valute.setName(rs.getString("name"));
+				valute.setCharCode(rs.getString("charcode"));
+				valute.setNumCode(rs.getString("numcode"));
+				valute.setNominal(rs.getInt("nominal"));
+				valute.setValue(rs.getDouble("valute_value"));
+				valute.setDate(rs.getDate("date").toLocalDate());
+				return valute;
+			}
 
-					@Override
-					public Valute mapRow(ResultSet rs, int rowNum) throws SQLException {
-						Valute valute = new Valute();
-						valute.setId(String.valueOf(rs.getInt("id")));
-						valute.setName(rs.getString("name"));
-						valute.setCharCode(rs.getString("charcode"));
-						valute.setNumCode(rs.getString("numcode"));
-						valute.setNominal(rs.getInt("nominal"));
-						valute.setValue(rs.getDouble("valute_value"));
-						valute.setDate(rs.getDate("date").toLocalDate());
-						return valute;
-					}
-
-				});
+		};
+		
+		List<Valute> valutes = jdbcTemplate.query(selectValutesPSCreator, selectValutesRowMapper);
 		return valutes;
 	}
 }

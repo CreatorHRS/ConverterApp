@@ -23,6 +23,7 @@ import ru.mikhailkhr.ConverterApp.entity.HistoryEntry;
 
 /**
  * History entry class that interact with database
+ * 
  * @author mikhailkhr
  *
  */
@@ -31,34 +32,43 @@ public class HistoryEntryJdbcDao {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-	
+
 	private final String SELECT_HISTOTY_BY_USER_ID = "SELECT h.valueToConvert, v1.charCode as charCodeFrom,v1.valute_value as valueFrom, v1.nominal as nominalFrom,"
-													+ "v2.charCode as charCodeTo, v2.valute_value as valueTo, v2.nominal as nominalTo, h.date_of_convertion as date, h.time_of_convertion as time "
-													+ "FROM my_schema.historyEntries h "
-													+ "inner join my_schema.valute v1 on v1.id = h.fromValute_id "
-													+ "inner join my_schema.valute v2 on v2.id = h.toValute_id  "
-													+ "WHERE h.user_id = %s";
-	
+			+ "v2.charCode as charCodeTo, v2.valute_value as valueTo, v2.nominal as nominalTo, h.date_of_convertion as date, h.time_of_convertion as time "
+			+ "FROM my_schema.historyEntries h " + "inner join my_schema.valute v1 on v1.id = h.fromValute_id "
+			+ "inner join my_schema.valute v2 on v2.id = h.toValute_id  " + "WHERE h.user_id = ?";
+
 	private final String SELECT_HISTOTY_BY_USER_ID_AND_BY_DATE = "SELECT h.valueToConvert, v1.charCode as charCodeFrom,v1.valute_value as valueFrom, v1.nominal as nominalFrom,"
 			+ "v2.charCode as charCodeTo, v2.valute_value as valueTo, v2.nominal as nominalTo, h.date_of_convertion as date, h.time_of_convertion as time "
-			+ "FROM my_schema.historyEntries h "
-			+ "inner join my_schema.valute v1 on v1.id = h.fromValute_id "
+			+ "FROM my_schema.historyEntries h " + "inner join my_schema.valute v1 on v1.id = h.fromValute_id "
 			+ "inner join my_schema.valute v2 on v2.id = h.toValute_id  "
-			+ "WHERE h.user_id = %s AND h.date_of_convertion = '%s'";
-	
+			+ "WHERE h.user_id = ? AND h.date_of_convertion = ?";
+
 	private final String INSERT_HISTORY_ENTRY = "INSERT INTO my_schema.historyEntries (fromValute_id, toValute_id, valueToConvert, user_id, date_of_convertion, time_of_convertion) "
-												+ "VALUES (?, ?, ?, ?, ?, ?)";	
-	
+			+ "VALUES (?, ?, ?, ?, ?, ?)";
+
 	DateTimeFormatter postresFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-	
+
 	/**
-	 * Find all history entries by user id 
+	 * Find all history entries by user id
+	 * 
 	 * @param userId {@code String}
-	 * @return list of history entry 
+	 * @return list of history entry
 	 */
-	public List<HistoryEntry> selectHistoryByUserId(String userId) 
-	{
-		List<HistoryEntry> history = jdbcTemplate.query(String.format(SELECT_HISTOTY_BY_USER_ID, userId), new RowMapper<HistoryEntry>(){
+	public List<HistoryEntry> selectHistoryByUserId(String userId) {
+		/*
+		 * Processing from SQL Injection 
+		 */
+		PreparedStatementCreator selectHistoryPSCreator =  new PreparedStatementCreator() {
+			
+			@Override
+			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+				PreparedStatement ps = con.prepareStatement(SELECT_HISTOTY_BY_USER_ID_AND_BY_DATE);
+				ps.setString(1, userId);
+				return ps;
+			}
+		};
+		RowMapper<HistoryEntry> selectHistoryRowMapper = new RowMapper<HistoryEntry>(){
 
 			@Override
 			public HistoryEntry mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -85,22 +95,25 @@ public class HistoryEntryJdbcDao {
 				return historyEntry;
 			}
 			
-		});
+		};
+		List<HistoryEntry> history = jdbcTemplate.query(selectHistoryPSCreator, selectHistoryRowMapper);
+		/*
+		 *sort by date 
+		 */
 		history.sort(new Comparator<HistoryEntry>() {
 
 			@Override
 			public int compare(HistoryEntry o1, HistoryEntry o2) {
 				LocalDateTime o1dt = LocalDateTime.of(o1.getDate(), o1.getTime());
 				LocalDateTime o2dt = LocalDateTime.of(o2.getDate(), o2.getTime());
-				
+
 				return o2dt.compareTo(o1dt);
 			}
 
-			
 		});
 		return history;
 	}
-	
+
 	/**
 	 * Find all history entries by user id and date
 	 * @param userId {@code String}
@@ -109,7 +122,22 @@ public class HistoryEntryJdbcDao {
 	 */
 	public List<HistoryEntry> selectHistoryByUserIdAndData(String userId, LocalDate date) 
 	{
-		List<HistoryEntry> history = jdbcTemplate.query(String.format(SELECT_HISTOTY_BY_USER_ID_AND_BY_DATE, userId, date.format(postresFormatter)), new RowMapper<HistoryEntry>(){
+		//String.format(SELECT_HISTOTY_BY_USER_ID_AND_BY_DATE, userId, date.format(postresFormatter)), 
+		
+		/*
+		 * Processing from SQL Injection 
+		 */
+		PreparedStatementCreator selectHistoryPSCreator =  new PreparedStatementCreator() {
+			
+			@Override
+			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+				PreparedStatement ps = con.prepareStatement(SELECT_HISTOTY_BY_USER_ID_AND_BY_DATE);
+				ps.setString(1, userId);
+				ps.setDate(2, Date.valueOf(date));
+				return ps;
+			}
+		};
+		RowMapper<HistoryEntry> selectHistoryRowMapper = new RowMapper<HistoryEntry>(){
 
 			@Override
 			public HistoryEntry mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -136,32 +164,34 @@ public class HistoryEntryJdbcDao {
 				return historyEntry;
 			}
 			
-		});
+		};
+		List<HistoryEntry> history = jdbcTemplate.query(selectHistoryPSCreator, selectHistoryRowMapper);
+		/*
+		 *sort by date 
+		 */
 		history.sort(new Comparator<HistoryEntry>() {
 
 			@Override
 			public int compare(HistoryEntry o1, HistoryEntry o2) {
 				LocalDateTime o1dt = LocalDateTime.of(o1.getDate(), o1.getTime());
 				LocalDateTime o2dt = LocalDateTime.of(o2.getDate(), o2.getTime());
-				
+
 				return o2dt.compareTo(o1dt);
 			}
 
-			
 		});
 		return history;
 	}
-	
-	/**
-	 * Insert history entry 
-	 * @param historyEntry {@code HistoryEntry}
-	 * @param user_id {@code String}
-	 */
-	public void insertHistoryEntry(HistoryEntry historyEntry, String user_id) 
-	{
-		jdbcTemplate.update (new PreparedStatementCreator() {
 
-			
+	/**
+	 * Insert history entry
+	 * 
+	 * @param historyEntry {@code HistoryEntry}
+	 * @param user_id      {@code String}
+	 */
+	public void insertHistoryEntry(HistoryEntry historyEntry, String user_id) {
+		jdbcTemplate.update(new PreparedStatementCreator() {
+
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 				PreparedStatement ps = con.prepareStatement(INSERT_HISTORY_ENTRY, Statement.RETURN_GENERATED_KEYS);
@@ -175,5 +205,5 @@ public class HistoryEntryJdbcDao {
 			}
 		});
 	}
-	
+
 }
