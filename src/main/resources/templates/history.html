@@ -4,44 +4,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <title>Document</title>
-
-    <link rel="stylesheet" href="./style.css">
 </head>
 
-<body>
-    <header>
-
-        <div id="name" th:text="'Имя пользователя: ' + ${name}" />
-        <div id="main-menu">
-
-
-            <div><a href="/main">Главная</a></div>
-            <div><a href="/history">История</a></div>
-            <div><a href="/logout">Выйдти</a></div>
-        </div>
-    </header>
-
-
-    <div class="history">
+<body style="background-image: url(/ConverterAppBackground.svg); background-size: cover;">
     
-    	<form action="/history_by_date" method="GET" id="dateForm">
-            <p>Выберите дату</p>
-            <input type="date" name="sort_date">
-            <button type="submit">Сортировать</button>
-        </form>
-        <div class="historyEntry" th:each="historyEntry : ${history}">
-            
-            <p>конвертация:</p>
-            <p th:text="${historyEntry.fromValue} + ' ' + ${historyEntry.fromCharCode}"></p>
-            <p>-</p>
-            <p th:text="${historyEntry.toValue} + ' ' + ${historyEntry.toCharCode}"></p>
-            <p></p>
-            <p th:text="${historyEntry.date} + ' ' + ${historyEntry.time}"></p>
+	
+	<header th:replace="header :: header"></header>
+	
+    <div class="container">
+        <div class="row mt-4">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <div class="container-fluid shadow p-3 rounded" style="background-color: #6fa8e2ff;">
+                    <div class="row">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-6">
+                            <form action="/history_by_date" method="GET" id="dateForm">
+                                <p>Выберите дату</p>
+                                <input type="date" name="sort_date">
+                                <button type="submit" class="btn btn-primary btn-sm">фильтровать</button>
+                                
+                            </form>
+                        </div>
+                        <div class="col-md-2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3"></div>
         </div>
+        <div class="row mt-4">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <table class="history-table table table-hover shadow p-3 mb-5 bg-white rounded">
+                    <tr>
+                        <th colspan="2">перевод из</th>
+                        <th colspan="2">Перевод в</th>
+                        <th>дата</th>
+                        <th>время</th>
 
+                    </tr>
+		                <tr th:each="historyEntry : ${history}">
+				        <td th:text="${historyEntry.fromValue}"></td>
+				        <td th:text="${historyEntry.fromCharCode}"></td>
+				        <td th:text="${historyEntry.toValue}"></td>
+				        <td th:text="${historyEntry.fromCharCode}"></td>
+				        <td th:text="${historyEntry.date}"></td>
+				        <td th:text="${historyEntry.time}"></td>
+					</tr>
+                    
+                </table>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
     </div>
-</body>
 
+</body>
 
 </html>

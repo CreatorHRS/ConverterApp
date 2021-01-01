@@ -2,80 +2,97 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
-    <link rel="stylesheet" href="./style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+	crossorigin="anonymous">
+<title>Document</title>
 </head>
 
-<body>
-    <header>
+<body style="background-image: url(/ConverterAppBackground.svg); background-size: cover;">
+	<header th:replace="header :: header"></header>
 
-        <div id="name" th:text="'Имя пользователя: ' + ${name}" />
-        <div id="main-menu">
+	<div class="container">
+		<div class="row mt-5"></div>
+		<div class="row mt-5"></div>
+		<div class="row mt-5">
+			<div class="col-md-4"></div>
+			<div class="col-md-4">
+				<form role="form" action="/main" method="POST">
 
 
-            <div><a href="/main">Главная</a></div>
-            <div><a href="/history">История</a></div>
-            <div><a href="/logout">Выйдти</a></div>
-        </div>
-    </header>
-    
-    
-    <div id="form">
-    <form action="/main" method="post">
-		<input name="date" th:value="${date}" hidden="true">
-        <div class="Curency">
+					<div class="shadow p-3 mb-5 bg-white rounded">
+						<div class="container-fluid">
+							<div class="row">
+								<h2 class="form-signin-heading">Конвертация</h2>
+							</div>
+							<div class="row mt-3">
+								<div class="col-md-6 mx-auto d-grid gap-2">
+									<select name="firstCurency" class="form-select form-select-sm">
+										<option th:if="${ShowResult}" th:value="${fromChar}"
+											th:text="${fromChar}"></option>
+										<option th:if="${ShowResult}" disabled>_________</option>
 
-            <div class="ChangerCurency">
-                <select name="firstCurency" class="ChangerCurencySelect">
-                
-                <option th:if="${ShowResult}" th:value="${fromChar}" th:text="${fromChar}"></option>
-    			<option th:if="${ShowResult}" disabled>_________</option>
-                
-                <option value="RUB">RUB</option>
-                	<option th:each="Valute : ${Valutes}" th:value="${Valute.getCharCode}" th:text="${Valute.getCharCode}"></option>
-                </select>
-                
-            </div>
-            <div class="ChangerCurency">
-                <select name="secondCurency" class="ChangerCurencySelect">
-                	
-                	
-                	<option th:if="${ShowResult}" th:value="${toChar}" th:text="${toChar}"></option>
-    				<option th:if="${ShowResult}" disabled>_________</option>
-                	<option value="RUB">RUB</option>
-                	<option th:each="Valute : ${Valutes}" th:value="${Valute.getCharCode}" th:text="${Valute.getCharCode}"></option>
-                </select>
-            </div>
-        </div>
-        <div class="Curency">
-            <div th:if="${ShowResult}" class="ChangerCurency">
-				<input name="number" class="ChangerCurencyInput" type="text" th:value="${number}" >
+										<option value="RUB">RUB</option>
+										<option th:each="Valute : ${Valutes}"
+											th:value="${Valute.getCharCode}"
+											th:text="${Valute.getCharCode}"></option>
+									</select>
+								</div>
+								<div class="col-md-6 mx-auto d-grid gap-2">
+									<select name="secondCurency" class="form-select form-select-sm">
+										<option th:if="${ShowResult}" th:value="${toChar}"
+											th:text="${toChar}"></option>
+										<option th:if="${ShowResult}" disabled>_________</option>
+										<option value="RUB">RUB</option>
+										<option th:each="Valute : ${Valutes}"
+											th:value="${Valute.getCharCode}"
+											th:text="${Valute.getCharCode}"></option>
+									</select>
+								</div>
+							</div>
+							<div class="row mt-3">
+								<div class="col-md-6 mx-auto d-grid gap-2">
+									<div th:if="${ShowResult}" class="ChangerCurency">
+										<input name="number" class="ChangerCurencyInput form-control"
+											type="text" th:value="${number}">
+									</div>
+
+									<div th:unless="${ShowResult}" class="ChangerCurency">
+										<input name="number" class="ChangerCurencyInput form-control"
+											type="text">
+									</div>
+								</div>
+								<div class="col-md-6 mx-auto d-grid gap-2">
+									<div th:if="${ShowResult}" class="ChangerCurency">
+										<input class="ChangerCurencyInput form-control" type="text"
+											th:value="${result}" readonly>
+									</div>
+
+									<div th:unless="${ShowResult}" class="ChangerCurency">
+										<input class="ChangerCurencyInput form-control" type="text"
+											value="0.0" readonly>
+									</div>
+								</div>
+							</div>
+							<input name="date" th:value="${date}" hidden="true">
+							<div class="row mt-3">
+								<div class="d-grid gap-2 col-6 mx-auto">
+									<button class="btn btn-lg btn-primary " type="submit">Конвертировать</button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</form>
 			</div>
-			
-			 <div th:unless="${ShowResult}" class="ChangerCurency">
-				<input name="number" class="ChangerCurencyInput" type="text">
-			</div>
-            
-            <div th:if="${ShowResult}" class="ChangerCurency">
-				<input class="ChangerCurencyInput" type="text" th:value="${result}" readonly>
-			</div>
-			
-			 <div th:unless="${ShowResult}" class="ChangerCurency">
-				<input class="ChangerCurencyInput" type="text" value="0.0" readonly>
-			</div>
-            
+			<div class="col-md-4"></div>
+		</div>
+	</div>
 
-        </div>
-        <div class="Curency">
-            <button id="subbut" type="submit">Convert</button>
-        </div>
-    </form>
-</div>
 </body>
-
-
 
 </html>

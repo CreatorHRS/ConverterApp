@@ -23,7 +23,7 @@ header{
     padding-right: 10px;
     font-size: 26px;
     padding-top: 30px;
-    height: 30%;
+    height: 100%;
     font-weight: 600;
 }
 #main-menu > div > a{
@@ -71,29 +71,34 @@ header{
 .ChangerCurencyInput{
     width: 100px;
 }
-#subbut{
+#subbut_convertion{
     margin: 0 auto;
     width: 200px;
     height: 50px;
+}
+
+body
+{
+    background-image: url("/ConverterAppBackground.svg");
+    background-size: 100%;
+    margin: 0;
+   
 }
 #form{
     margin-top: 50px;
     margin-left: 35%;
     margin-right: 35%;
     padding: 30px;
-    background-color:rgba(37, 92, 194, 0.404);
-}
-
-.result{
-	color: red;
-	margin: 0 auto;
+    background-color:rgb(123, 153, 209);
+    box-shadow: 0 4px 8px 0 rgb(0, 0, 0, 0.2), 0 6px 20px 0 rgb(0, 0, 0, 0.2);
+    
 }
 
 .historyEntry
 {
     margin: 0 auto;
     background-color: rgb(142, 175, 236);
-    margin-top: 10px;
+    
     display: flex;
 }
 .history
@@ -105,13 +110,17 @@ header{
 {
     margin-right: 10px;
     margin-left: 10px;
-    
    
 }
-
 #dateForm
 {
     margin: 10px;
-    background-color: rgb(140, 164, 209);
+    background-color: #4383ae;
     padding: 10px;
+}
+.history-table
+{
+	background-color:rgb(123, 153, 209);
+	color: white;
+	box-shadow: 0 4px 8px 0 rgb(0, 0, 0, 0.2), 0 6px 20px 0 rgb(0, 0, 0, 0.2);
 }

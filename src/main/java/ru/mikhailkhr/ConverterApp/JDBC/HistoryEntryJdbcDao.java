@@ -63,8 +63,8 @@ public class HistoryEntryJdbcDao {
 			
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-				PreparedStatement ps = con.prepareStatement(SELECT_HISTOTY_BY_USER_ID_AND_BY_DATE);
-				ps.setString(1, userId);
+				PreparedStatement ps = con.prepareStatement(SELECT_HISTOTY_BY_USER_ID, Statement.RETURN_GENERATED_KEYS);
+				ps.setInt(1, Integer.parseInt(userId));
 				return ps;
 			}
 		};
@@ -132,7 +132,7 @@ public class HistoryEntryJdbcDao {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 				PreparedStatement ps = con.prepareStatement(SELECT_HISTOTY_BY_USER_ID_AND_BY_DATE);
-				ps.setString(1, userId);
+				ps.setInt(1, Integer.parseInt(userId));
 				ps.setDate(2, Date.valueOf(date));
 				return ps;
 			}
