@@ -33,7 +33,7 @@ public class WebConfig extends WebSecurityConfigurerAdapter{
 	protected void configure(HttpSecurity http) throws Exception {
 		super.configure(http);
 		http.csrf().disable().formLogin()
-        .loginPage("/login").permitAll();
+        .loginPage("/login").permitAll().defaultSuccessUrl("/main");
 	}
 	
 	@Bean

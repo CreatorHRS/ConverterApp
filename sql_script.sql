@@ -1,33 +1,23 @@
 CREATE SCHEMA my_schema;
 
 CREATE TABLE my_schema.converterappuser
-{
+(
  id            SERIAL PRIMARY KEY NOT NULL,
- username      CHAR(255)          NOT NULL,
- usermail      CHAR(255)          NOT NULL,
- userpass      CHAR(255)          NOT NULL
-};
-
-INSERT INTO y_schema.converterappuser (username, usermail, userpass)
-VALUES('TestUser', 'TestUserMail@mail.ru', 'TestUser');
-
-CREATE TABLE my_schema.valute(
-   id            SERIAL PRIMARY KEY NOT NULL,
-   name          CHAR(255)          NOT NULL,
-   numCode       CHAR(6)            NOT NULL,
-   charCode      CHAR(3)            NOT NULL,
-   valute_value  REAL               NOT NULL,
-   nominal       INT                NOT NULL,
-	date          DATE               NOT NULL
+ username      VARCHAR(255)          NOT NULL,
+ usermail      VARCHAR(255)          NOT NULL,
+ userpass      VARCHAR(255)          NOT NULL
 );
 
+INSERT INTO my_schema.converterappuser (username, usermail, userpass)
+VALUES('TestUser', 'TestUserMail@mail.ru', 'TestUser');
+
 
 
 CREATE TABLE my_schema.valute(
    id            SERIAL PRIMARY KEY NOT NULL,
-   name          CHAR(255)          NOT NULL,
-   numCode       CHAR(6)            NOT NULL,
-   charCode      CHAR(3)            NOT NULL,
+   name          VARCHAR(255)          NOT NULL,
+   numCode       VARCHAR(6)            NOT NULL,
+   charCode      VARCHAR(3)            NOT NULL,
    valute_value  REAL               NOT NULL,
    nominal       INT                NOT NULL,
 	date          DATE               NOT NULL

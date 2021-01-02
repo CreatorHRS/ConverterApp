@@ -8,10 +8,10 @@ How to install app
 	
 3. Edit property file, seting you database information /src/main/resources/appliacation.properties
 
-4. Run the sql scrypt using you database,
-	it will create a temp test user:
+4. Run the SQL script using you database,
+	it will create a test test user:
 	Usermail: TestUserMail@mail.ru
 	Userpass: TestUser
 	
 5. Run the app: 
-	mvn update | mvn spring-boot:run
+	mvn spring-boot:run
