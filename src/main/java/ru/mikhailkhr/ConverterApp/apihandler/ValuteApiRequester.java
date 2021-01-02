@@ -44,9 +44,8 @@ public class ValuteApiRequester {
 	public List<Valute> getVaulter() {
 		List<Valute> list = new ArrayList<>();
 		Document doc = null;
-		/*
-		 * making a call
-		 */
+	
+		// making a call	 
 		try {
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			doc = builder.parse(uri);
@@ -58,9 +57,8 @@ public class ValuteApiRequester {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		/*
-		 * prepare the elements to parse 
-		 */
+
+		// prepare the elements to parse		
 		NodeList elements = doc.getElementsByTagName("Valute");
 		String dateString = doc.getElementsByTagName("ValCurs").item(0).getAttributes().getNamedItem("Date").getTextContent();
 		final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");

@@ -16,9 +16,8 @@ import ru.mikhailkhr.ConverterApp.entity.ConverterAppUser;
  */
 public class SecurityUser implements UserDetails{
 	
-	/**
-	 * Actual system user class
-	 */
+	
+ 	// Actual system user class
 	private ConverterAppUser user;
 	private List<SimpleGrantedAuthority> autoritis;
 	

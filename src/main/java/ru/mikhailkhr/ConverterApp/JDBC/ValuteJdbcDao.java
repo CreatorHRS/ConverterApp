@@ -29,9 +29,8 @@ public class ValuteJdbcDao {
 
 	private final String INSERT_SQL = "INSERT INTO my_schema.valute (name, numCode, charCode, valute_value, nominal, date) VALUES (?, ?, ?, ?, ?, ?);";
 	private final String SELECT_ALL_VALUTES_BY_DATE = "SELECT * FROM my_schema.valute WHERE date = ?";
-	/*
-	 * Standard sql database formatter
-	 */
+	
+	// Standard sql database formatter
 	DateTimeFormatter postresFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	@Autowired
 	JdbcTemplate jdbcTemplate;
@@ -70,9 +69,8 @@ public class ValuteJdbcDao {
 	 * @return list of found valutes
 	 */
 	public List<Valute> getAllValuteByDate(LocalDate date) {
-		/*
-		 * Processing from SQL Injection 
-		 */
+		
+		// Processing from SQL Injection 
 		PreparedStatementCreator selectValutesPSCreator = new PreparedStatementCreator() {
 			
 			@Override

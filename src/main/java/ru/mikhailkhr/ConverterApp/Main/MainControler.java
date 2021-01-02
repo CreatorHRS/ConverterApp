@@ -1,6 +1,7 @@
 package ru.mikhailkhr.ConverterApp.Main;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -26,7 +27,6 @@ import ru.mikhailkhr.ConverterApp.security.SecurityUser;
 @Controller
 public class MainControler {
 
-	
 	@Autowired
 	ValuteJdbcDao valuteJdbcDao;
 	@Autowired
@@ -36,10 +36,11 @@ public class MainControler {
 	@Autowired
 	ValuteApiRequester valuteApiRequester;
 	DateTimeFormatter postresFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-	
+
 	/**
-	 * Main controller that return basic valutes,
-	 * if valutes not in the database call the api and write in to the database
+	 * Main controller that return basic valutes, if valutes not in the database
+	 * call the api and write in to the database
+	 * 
 	 * @param model
 	 * @param request
 	 * @param authentication
@@ -47,52 +48,46 @@ public class MainControler {
 	 */
 	@GetMapping("/main")
 	public String main(Model model, HttpServletRequest request, Authentication authentication) {
-		 	
+
 		SecurityUser userDetails = (SecurityUser) authentication.getPrincipal();
 		LocalDate todayDate = LocalDate.now();
-		/*
-		 * tries to get valutes from database 
-		 */
+		// tries to get valutes from database
 		List<Valute> list = valuteJdbcDao.getAllValuteByDate(todayDate);
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-		
-		/*
-		 * if new values not in the database treis to get the valutes using api 
-		 */
-		if(list.size() < 1) {
+
+		// if new values not in the database treis to get the valutes using api
+		if (list.size() < 1) {
 			list = valuteApiRequester.getVaulter();
 			Valute valute = list.get(0);
 			/*
-			 * BAG REPORT: I don't not if it suppose to work this way,
-			 * bus sometimes the api returns the previous day value, 
-			 * but what more important previous day date in the xml file
-			 * and I need to check if the valutes with this date already in the database
+			 * BAG REPORT: I don't not if it suppose to work this way, bus sometimes the api
+			 * returns the previous day value, but what more important previous day date in
+			 * the xml file and I need to check if the valutes with this date already in the
+			 * database
 			 */
-			if(valute.getDate().isEqual(todayDate)) 
-			{
+			if (valute.getDate().isEqual(todayDate)) {
 				valuteJdbcDao.putAllValute(list);
-			}else {
+			} else {
 				todayDate = valute.getDate();
 				int listSize = valuteJdbcDao.getAllValuteByDate(todayDate).size();
-				if(listSize < 1) {
+				if (listSize < 1) {
 					valuteJdbcDao.putAllValute(list);
 				}
 			}
-			
-			
+
 		}
-		/*
-		 * set model attributes to user in thymeleaf
-		 */
+
+		// set model attributes to user in thymeleaf
 		model.addAttribute("date", todayDate.format(postresFormatter));
 		model.addAttribute("Valutes", list);
 		model.addAttribute("ShowResult", false);
 		model.addAttribute("name", userDetails.getUsername());
 		return "mainApp";
 	}
-	
+
 	/**
 	 * Controller that actually manage a convertion and return result
+	 * 
 	 * @param request
 	 * @param model
 	 * @param authentication
@@ -100,29 +95,72 @@ public class MainControler {
 	 */
 	@PostMapping("/main")
 	public String mainConvert(HttpServletRequest request, Model model, Authentication authentication) {
-		
+
 		SecurityUser userDetails = (SecurityUser) authentication.getPrincipal();
-		/*
-		 * get all needed attributes from request
-		 */
-		String charCodeFrom = request.getParameter("firstCurency"); 
+
+		// get all needed attributes from request
+
+		String charCodeFrom = request.getParameter("firstCurency");
 		String charCodeTo = request.getParameter("secondCurency");
-		/*
-		 * Get the date of last updated valutes
-		 */
-		LocalDate localDate = LocalDate.parse(request.getParameter("date"), postresFormatter); 
-		String number = request.getParameter("number");
-		/*
-		 * convert the valute
-		 */
-		Double result = convertintValutes.convertValultes(charCodeFrom, charCodeTo,Double.valueOf(number), localDate);
-		/*
-		 * get valutes for select box from database useing last updated valutes date
-		 */
+
+		// Get the date of last updated valutes
+		LocalDate localDate = LocalDate.parse(request.getParameter("date"), postresFormatter);
+		double number = Double.valueOf(request.getParameter("number"));
+
+		// convert the valute
+		String user_id = userDetails.getId();
 		List<Valute> list = valuteJdbcDao.getAllValuteByDate(localDate);
-		/*
-		 * set model attributes to user in thymeleaf
-		 */
+
+		double fromValue = 0.0;
+		double fromNominal = 0.0;
+		double toValue = 0.0;
+		double toNominal = 0.0;
+		String fromId = "";
+		String toId = "";
+
+		// if value if RUB user default values
+
+		if ("RUB".equals(charCodeFrom)) {
+
+			fromNominal = 1.0;
+			fromValue = 1.0;
+			fromId = "1";
+		}
+
+		// if value if RUB user default values
+
+		if ("RUB".equals(charCodeTo)) {
+			toNominal = 1.0;
+			toValue = 1.0;
+			toId = "1";
+		}
+
+		// Tries to find propriate values by char code
+
+		for (Valute valute : list) {
+			if (valute.getCharCode().equals(charCodeFrom)) {
+				fromNominal = (double) valute.getNominal();
+				fromValue = valute.getValue();
+				fromId = valute.getId();
+			}
+			if (valute.getCharCode().equals(charCodeTo)) {
+				toNominal = (double) valute.getNominal();
+				toValue = valute.getValue();
+				toId = valute.getId();
+			}
+		}
+
+		double result = convertintValutes.convertValultes(fromValue, fromNominal, toValue, toNominal, number);
+
+		// create history entry
+		HistoryEntry historyEntry = new HistoryEntry(charCodeFrom, charCodeTo, number, result, LocalTime.now(),
+				LocalDate.now(), fromId, toId);
+
+		// put history entry to database
+		historyEntryJdbcDao.insertHistoryEntry(historyEntry, user_id);
+
+		// set model attributes to user in thymeleaf
+
 		model.addAttribute("Valutes", list);
 		model.addAttribute("ShowResult", true);
 		model.addAttribute("result", result);
@@ -133,66 +171,51 @@ public class MainControler {
 		model.addAttribute("name", userDetails.getUsername());
 		return "mainApp";
 	}
-	
-	/*
-	 * Controller for history page
-	 */
+
+	// Controller for history page
+
 	@GetMapping("/history")
 	public String getHistory(HttpServletRequest request, Model model, Authentication authentication) {
-		
+
 		SecurityUser userDetails = (SecurityUser) authentication.getPrincipal();
-		/*
-		 * get history by user id
-		 */
-		List<HistoryEntry> history =  historyEntryJdbcDao.selectHistoryByUserId(userDetails.getId());
-		/*
-		 * set model attributes to user in thymeleaf
-		 */
-		model.addAttribute("history", history);
-		model.addAttribute("name", userDetails.getUsername());
-		return "history";
-	}
-	
-	/*
-	 * Controller for history page sorted by date
-	 */
-	@GetMapping("/history_by_date")
-	public String getHistoryByDate(HttpServletRequest request, Model model, Authentication authentication) {
-		
-		DateTimeFormatter dateChoserFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		List<HistoryEntry> history = null;
+
 		String date = request.getParameter("sort_date");
-		SecurityUser userDetails = (SecurityUser) authentication.getPrincipal();
-		LocalDate dateGetBy = LocalDate.parse(date, dateChoserFormatter);
-		/*
-		 * get history by user id
-		 */
-		List<HistoryEntry> history =  historyEntryJdbcDao.selectHistoryByUserIdAndData(userDetails.getId(), dateGetBy);
-		/*
-		 * set model attributes to user in thymeleaf
-		 */
+		if (date != null) {
+			//if date is not null, search history by date
+			DateTimeFormatter dateChoserFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			LocalDate dateGetBy = LocalDate.parse(date, dateChoserFormatter);
+
+			// get history by user id and by date
+			history = historyEntryJdbcDao.selectHistoryByUserIdAndData(userDetails.getId(), dateGetBy);
+
+		} else {
+			// get history by user id
+			history = historyEntryJdbcDao.selectHistoryByUserId(userDetails.getId());
+
+			// set model attributes to user in thymeleaf
+
+		}
 		model.addAttribute("history", history);
 		model.addAttribute("name", userDetails.getUsername());
+
 		return "history";
 	}
-	
-	
-	
+
 	@GetMapping("/")
 	public String dafaultRedirect() {
 		return "redirect:/main";
 	}
-	
-	
-	     
-	    @GetMapping("/login")
-	    public String viewLoginPage() {
-	      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	      if(authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-	    	  return "login";
-	      }else {
-	    	  return "redirect:/";
-	      }
-	    
+
+	@GetMapping("/login")
+	public String viewLoginPage() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+			return "login";
+		} else {
+			return "redirect:/";
+		}
+
 	}
-	
+
 }

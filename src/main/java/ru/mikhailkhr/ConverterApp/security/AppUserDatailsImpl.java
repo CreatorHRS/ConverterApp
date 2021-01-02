@@ -19,7 +19,6 @@ public class AppUserDatailsImpl implements UserDetailsService{
 	@Autowired
 	AppUserJdbcDao appUserJdbcDao;
 	
-	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		ConverterAppUser user =  appUserJdbcDao.getUserByMail(username);

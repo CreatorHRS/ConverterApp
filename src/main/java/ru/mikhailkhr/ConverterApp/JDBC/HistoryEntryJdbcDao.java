@@ -19,6 +19,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import ru.mikhailkhr.ConverterApp.Main.ValuteConverter;
 import ru.mikhailkhr.ConverterApp.entity.HistoryEntry;
 
 /**
@@ -32,6 +33,8 @@ public class HistoryEntryJdbcDao {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
+	@Autowired
+	ValuteConverter convertintValutes;
 
 	private final String SELECT_HISTOTY_BY_USER_ID = "SELECT h.valueToConvert, v1.charCode as charCodeFrom,v1.valute_value as valueFrom, v1.nominal as nominalFrom,"
 			+ "v2.charCode as charCodeTo, v2.valute_value as valueTo, v2.nominal as nominalTo, h.date_of_convertion as date, h.time_of_convertion as time "
@@ -56,9 +59,8 @@ public class HistoryEntryJdbcDao {
 	 * @return list of history entry
 	 */
 	public List<HistoryEntry> selectHistoryByUserId(String userId) {
-		/*
-		 * Processing from SQL Injection 
-		 */
+		
+		// Processing from SQL Injection 
 		PreparedStatementCreator selectHistoryPSCreator =  new PreparedStatementCreator() {
 			
 			@Override
@@ -82,10 +84,9 @@ public class HistoryEntryJdbcDao {
 				double valueTo = rs.getDouble("valueTo");
 				double nominalForm = rs.getDouble("nominalFrom");
 				double nominalTo = rs.getDouble("nominalTo");
-				double valueAfterConvert = (valueToConvert * nominalForm * valueFrom) / nominalTo / valueTo; 
-				/*
-				 * Set rest of information to class
-				 */
+				double valueAfterConvert =  convertintValutes.convertValultes(valueFrom, nominalForm, valueTo, nominalTo, valueToConvert);
+				
+				// Set rest of information to class
 				historyEntry.setToCharCode(rs.getString("charCodeTo"));
 				historyEntry.setFromValue(valueToConvert);
 				historyEntry.setFromCharCode(rs.getString("charCodeFrom"));
@@ -97,9 +98,8 @@ public class HistoryEntryJdbcDao {
 			
 		};
 		List<HistoryEntry> history = jdbcTemplate.query(selectHistoryPSCreator, selectHistoryRowMapper);
-		/*
-		 *sort by date 
-		 */
+
+		// sort by date 
 		history.sort(new Comparator<HistoryEntry>() {
 
 			@Override
@@ -124,9 +124,8 @@ public class HistoryEntryJdbcDao {
 	{
 		//String.format(SELECT_HISTOTY_BY_USER_ID_AND_BY_DATE, userId, date.format(postresFormatter)), 
 		
-		/*
-		 * Processing from SQL Injection 
-		 */
+		
+		// Processing from SQL Injection 
 		PreparedStatementCreator selectHistoryPSCreator =  new PreparedStatementCreator() {
 			
 			@Override
@@ -151,10 +150,9 @@ public class HistoryEntryJdbcDao {
 				double valueTo = rs.getDouble("valueTo");
 				double nominalForm = rs.getDouble("nominalFrom");
 				double nominalTo = rs.getDouble("nominalTo");
-				double valueAfterConvert = (valueToConvert * nominalForm * valueFrom) / nominalTo / valueTo; 
-				/*
-				 * Set rest of information to class
-				 */
+				double valueAfterConvert = convertintValutes.convertValultes(valueFrom, nominalForm, valueTo, nominalTo, valueToConvert);
+				
+				// Set rest of information to class
 				historyEntry.setToCharCode(rs.getString("charCodeTo"));
 				historyEntry.setFromValue(valueToConvert);
 				historyEntry.setFromCharCode(rs.getString("charCodeFrom"));
@@ -166,9 +164,8 @@ public class HistoryEntryJdbcDao {
 			
 		};
 		List<HistoryEntry> history = jdbcTemplate.query(selectHistoryPSCreator, selectHistoryRowMapper);
-		/*
-		 *sort by date 
-		 */
+		
+		// sort by date
 		history.sort(new Comparator<HistoryEntry>() {
 
 			@Override
