@@ -24,24 +24,23 @@
 					<div class="form-group col-md-8 mx-auto">
 						<!-- <div class="shadow p-3 mb-5 bg-white rounded">Regular shadow</div> -->
 
-
-						<h2 class="form-signin-heading">Войдите</h2>
+						<h2 class="form-signin-heading" th:text="#{message.login_page.label.login_title}"></h2>
 						<div th:if="${param.error}">
 							<p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
 						</div>
 
 						<p>
-							<label for="username" class="sr-only">Mail</label> <input
+							<label for="username" class="sr-only" th:text="#{message.login_page.label.login_mail}"></label> <input
 								type="mail" id="username" name="username" class="form-control"
-								placeholder="mail" required autofocus>
+								th:placeholder="#{message.login_page.placeholder.login_mail}" required autofocus>
 						</p>
 						<p>
-							<label for="password" class="sr-only">Пароль</label> <input
+							<label for="password" class="sr-only" th:text="#{message.login_page.label.login_password}"></label> <input
 								type="password" id="password" name="password"
-								class="form-control" placeholder="пароль" required>
+								class="form-control" th:placeholder="#{message.login_page.placeholder.login_password}" required>
 						</p>
 						<div class="d-grid gap-2 col-6 mx-auto">
-							<button class="btn btn-lg btn-primary " type="submit">Войти</button>
+							<button class="btn btn-lg btn-primary " type="submit" th:text="#{message.login_page.label.login_action}"></button>
 						</div>
 
 
