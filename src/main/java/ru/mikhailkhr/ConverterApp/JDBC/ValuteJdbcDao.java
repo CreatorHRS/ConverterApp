@@ -9,6 +9,9 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -27,56 +30,39 @@ import ru.mikhailkhr.ConverterApp.entity.Valute;
 @Repository
 public class ValuteJdbcDao {
 
-	private final String INSERT_SQL = "INSERT INTO my_schema.valute (name, numCode, charCode, valute_value, nominal, date) VALUES (?, ?, ?, ?, ?, ?);";
-	private final String SELECT_ALL_VALUTES_BY_DATE = "SELECT * FROM my_schema.valute WHERE date = ?";
+	private final String SELECT_VALUTES = "SELECT val.numcode, val.charcode, vali.info as name, vali.locale FROM converterappschema.valute as val\n "
+										+ "INNER JOIN converterappschema.valute_info as vali\n "
+										+ "ON val.numcode = vali.valute_numcode\n "
+										+ "WHERE vali.locale = ?;";
 	
 	// Standard sql database formatter
 	DateTimeFormatter postresFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-	/**
-	 * Put all valutes in list to the database
-	 * @param list {@code List<Valute>}
-	 */
-	public void putAllValute(List<Valute> list) {
-
-		jdbcTemplate.batchUpdate(INSERT_SQL, new BatchPreparedStatementSetter() {
-
-			@Override
-			public void setValues(PreparedStatement ps, int i) throws SQLException {
-				// TODO Auto-generated method stub
-				Valute valute = list.get(i);
-				ps.setString(1, valute.getName());
-				ps.setString(2, valute.getNumCode());
-				ps.setString(3, valute.getCharCode());
-				ps.setDouble(4, valute.getValue());
-				ps.setInt(5, valute.getNominal());
-				ps.setDate(6, Date.valueOf(valute.getDate()));
-			}
-
-			@Override
-			public int getBatchSize() {
-				// TODO Auto-generated method stub
-				return list.size();
-			}
-		});
-		
-
-	}
+	
 	/**
 	 * Select all valutes from database by date
 	 * @param date {@code LocalDate}
 	 * @return list of found valutes
 	 */
-	public List<Valute> getAllValuteByDate(LocalDate date) {
+	public List<Valute> getAllValuteByLocale(Locale locale) {
 		
 		// Processing from SQL Injection 
 		PreparedStatementCreator selectValutesPSCreator = new PreparedStatementCreator() {
 			
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-				PreparedStatement ps = con.prepareStatement(SELECT_ALL_VALUTES_BY_DATE, Statement.RETURN_GENERATED_KEYS);
-				ps.setDate(1, Date.valueOf(date));
+				PreparedStatement ps = con.prepareStatement(SELECT_VALUTES, Statement.RETURN_GENERATED_KEYS);
+				
+				String localeTag = locale.toLanguageTag();
+				System.out.println("getLanguage = " + locale.getLanguage());
+				System.out.println("getDisplayLanguage = " + locale.getDisplayLanguage());
+				String localeRegex = "(\\w\\w).*";
+				Pattern pattern = Pattern.compile(localeRegex);
+				Matcher match = pattern.matcher(localeTag);
+				match.find();
+				String language = match.group(1);
+				ps.setString(1, language);
 				return ps;
 			}
 		};
@@ -85,13 +71,9 @@ public class ValuteJdbcDao {
 			@Override
 			public Valute mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Valute valute = new Valute();
-				valute.setId(String.valueOf(rs.getInt("id")));
-				valute.setName(rs.getString("name"));
-				valute.setCharCode(rs.getString("charcode"));
-				valute.setNumCode(rs.getString("numcode"));
-				valute.setNominal(rs.getInt("nominal"));
-				valute.setValue(rs.getDouble("valute_value"));
-				valute.setDate(rs.getDate("date").toLocalDate());
+				valute.setName(rs.getString(3));
+				valute.setCharCode(rs.getString(2));
+				valute.setNumCode(rs.getInt(1));
 				return valute;
 			}
 

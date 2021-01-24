@@ -8,19 +8,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-
 import ru.mikhailkhr.ConverterApp.Main.ValuteConverter;
 import ru.mikhailkhr.ConverterApp.entity.HistoryEntry;
+
+
 
 /**
  * History entry class that interact with database
@@ -35,19 +33,40 @@ public class HistoryEntryJdbcDao {
 	JdbcTemplate jdbcTemplate;
 	@Autowired
 	ValuteConverter convertintValutes;
+	
+	private final String SELECT_HISTOTY_BY_USER_ID = "SELECT from_valute.charcode, from_valute_value.valute_value,\n"
+													+ "from_valute_value.nominal, to_valute.charcode ,\n"
+													+ "to_valute_value.valute_value, to_valute_value.nominal,\n"
+													+ "hist.number, hist.date_of_convertion, hist.time_of_convertion\n"
+													+ "FROM converterAppSchema.historyEntries as hist\n"
+													+ "INNER JOIN converterAppSchema.valute_value AS from_valute_value\n"
+													+ "ON hist.from_valute_value_id = from_valute_value.id\n"
+													+ "INNER JOIN converterappschema.valute AS from_valute\n"
+													+ "ON from_valute_value.valute_numcode = from_valute.numcode\n"
+													+ "INNER JOIN converterappschema.valute_value AS to_valute_value\n"
+													+ "ON hist.to_valute_value_id = to_valute_value.id\n"
+													+ "INNER JOIN converterappschema.valute AS to_valute\n"
+													+ "ON to_valute_value.valute_numcode = to_valute.numcode\n"
+													+ "WHERE hist.user_id = ? ORDER BY hist.date_of_convertion  DESC, \n"
+													+ "hist.time_of_convertion DESC;";
 
-	private final String SELECT_HISTOTY_BY_USER_ID = "SELECT h.valueToConvert, v1.charCode as charCodeFrom,v1.valute_value as valueFrom, v1.nominal as nominalFrom,"
-			+ "v2.charCode as charCodeTo, v2.valute_value as valueTo, v2.nominal as nominalTo, h.date_of_convertion as date, h.time_of_convertion as time "
-			+ "FROM my_schema.historyEntries h " + "inner join my_schema.valute v1 on v1.id = h.fromValute_id "
-			+ "inner join my_schema.valute v2 on v2.id = h.toValute_id  " + "WHERE h.user_id = ?";
+	private final String SELECT_HISTOTY_BY_USER_ID_AND_BY_DATE = "SELECT from_valute.charcode, from_valute_value.valute_value,\n"
+													+ "from_valute_value.nominal, to_valute.charcode ,\n"
+													+ "to_valute_value.valute_value, to_valute_value.nominal,\n"
+													+ "hist.number, hist.date_of_convertion, hist.time_of_convertion\n"
+													+ "FROM converterAppSchema.historyEntries as hist\n"
+													+ "INNER JOIN converterAppSchema.valute_value AS from_valute_value\n"
+													+ "ON hist.from_valute_value_id = from_valute_value.id\n"
+													+ "INNER JOIN converterappschema.valute AS from_valute\n"
+													+ "ON from_valute_value.valute_numcode = from_valute.numcode\n"
+													+ "INNER JOIN converterappschema.valute_value AS to_valute_value\n"
+													+ "ON hist.to_valute_value_id = to_valute_value.id\n"
+													+ "INNER JOIN converterappschema.valute AS to_valute\n"
+													+ "ON to_valute_value.valute_numcode = to_valute.numcode\n"
+													+ "WHERE hist.user_id = ? AND hist.date_of_convertion = ? \n"
+													+ "ORDER BY hist.date_of_convertion  DESC, hist.time_of_convertion DESC;";
 
-	private final String SELECT_HISTOTY_BY_USER_ID_AND_BY_DATE = "SELECT h.valueToConvert, v1.charCode as charCodeFrom,v1.valute_value as valueFrom, v1.nominal as nominalFrom,"
-			+ "v2.charCode as charCodeTo, v2.valute_value as valueTo, v2.nominal as nominalTo, h.date_of_convertion as date, h.time_of_convertion as time "
-			+ "FROM my_schema.historyEntries h " + "inner join my_schema.valute v1 on v1.id = h.fromValute_id "
-			+ "inner join my_schema.valute v2 on v2.id = h.toValute_id  "
-			+ "WHERE h.user_id = ? AND h.date_of_convertion = ?";
-
-	private final String INSERT_HISTORY_ENTRY = "INSERT INTO my_schema.historyEntries (fromValute_id, toValute_id, valueToConvert, user_id, date_of_convertion, time_of_convertion) "
+	private final String INSERT_HISTORY_ENTRY = "INSERT INTO converterAppSchema.historyEntries (from_valute_value_id, to_valute_value_id, number, user_id, date_of_convertion, time_of_convertion) "
 			+ "VALUES (?, ?, ?, ?, ?, ?)";
 
 	DateTimeFormatter postresFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -58,7 +77,7 @@ public class HistoryEntryJdbcDao {
 	 * @param userId {@code String}
 	 * @return list of history entry
 	 */
-	public List<HistoryEntry> selectHistoryByUserId(String userId) {
+	public List<HistoryEntry> selectHistoryByUserId(int userId) {
 		
 		// Processing from SQL Injection 
 		PreparedStatementCreator selectHistoryPSCreator =  new PreparedStatementCreator() {
@@ -66,7 +85,7 @@ public class HistoryEntryJdbcDao {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 				PreparedStatement ps = con.prepareStatement(SELECT_HISTOTY_BY_USER_ID, Statement.RETURN_GENERATED_KEYS);
-				ps.setInt(1, Integer.parseInt(userId));
+				ps.setInt(1, userId);
 				return ps;
 			}
 		};
@@ -79,38 +98,26 @@ public class HistoryEntryJdbcDao {
 				 * Using all needed information from sql result calculate
 				 * all values
 				 */
-				double valueToConvert = rs.getDouble("valueToConvert");
-				double valueFrom = rs.getDouble("valueFrom");
-				double valueTo = rs.getDouble("valueTo");
-				double nominalForm = rs.getDouble("nominalFrom");
-				double nominalTo = rs.getDouble("nominalTo");
+				double valueFrom = rs.getDouble(2);
+				double nominalForm = rs.getDouble(3);
+				double valueTo = rs.getDouble(5);
+				double nominalTo = rs.getDouble(6);
+				double valueToConvert = rs.getDouble(7);
 				double valueAfterConvert =  convertintValutes.convertValultes(valueFrom, nominalForm, valueTo, nominalTo, valueToConvert);
 				
 				// Set rest of information to class
-				historyEntry.setToCharCode(rs.getString("charCodeTo"));
+				historyEntry.setFromCharCode(rs.getString(1));
+				historyEntry.setToCharCode(rs.getString(4));
 				historyEntry.setFromValue(valueToConvert);
-				historyEntry.setFromCharCode(rs.getString("charCodeFrom"));
 				historyEntry.setToValue(valueAfterConvert);
-				historyEntry.setTime(rs.getTime("time").toLocalTime());
-				historyEntry.setDate(rs.getDate("date").toLocalDate());
+				historyEntry.setDate(rs.getDate(8).toLocalDate());
+				historyEntry.setTime(rs.getTime(9).toLocalTime());
 				return historyEntry;
 			}
 			
 		};
 		List<HistoryEntry> history = jdbcTemplate.query(selectHistoryPSCreator, selectHistoryRowMapper);
 
-		// sort by date 
-		history.sort(new Comparator<HistoryEntry>() {
-
-			@Override
-			public int compare(HistoryEntry o1, HistoryEntry o2) {
-				LocalDateTime o1dt = LocalDateTime.of(o1.getDate(), o1.getTime());
-				LocalDateTime o2dt = LocalDateTime.of(o2.getDate(), o2.getTime());
-
-				return o2dt.compareTo(o1dt);
-			}
-
-		});
 		return history;
 	}
 
@@ -120,7 +127,7 @@ public class HistoryEntryJdbcDao {
 	 * @param date {@code LocalDate}
 	 * @return list of history entry 
 	 */
-	public List<HistoryEntry> selectHistoryByUserIdAndData(String userId, LocalDate date) 
+	public List<HistoryEntry> selectHistoryByUserIdAndData(int userId, LocalDate date) 
 	{
 		//String.format(SELECT_HISTOTY_BY_USER_ID_AND_BY_DATE, userId, date.format(postresFormatter)), 
 		
@@ -131,7 +138,7 @@ public class HistoryEntryJdbcDao {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 				PreparedStatement ps = con.prepareStatement(SELECT_HISTOTY_BY_USER_ID_AND_BY_DATE);
-				ps.setInt(1, Integer.parseInt(userId));
+				ps.setInt(1, userId);
 				ps.setDate(2, Date.valueOf(date));
 				return ps;
 			}
@@ -145,38 +152,26 @@ public class HistoryEntryJdbcDao {
 				 * Using all needed information from sql result calculate
 				 * all values
 				 */
-				double valueToConvert = rs.getDouble("valueToConvert");
-				double valueFrom = rs.getDouble("valueFrom");
-				double valueTo = rs.getDouble("valueTo");
-				double nominalForm = rs.getDouble("nominalFrom");
-				double nominalTo = rs.getDouble("nominalTo");
-				double valueAfterConvert = convertintValutes.convertValultes(valueFrom, nominalForm, valueTo, nominalTo, valueToConvert);
+				double valueFrom = rs.getDouble(2);
+				double nominalForm = rs.getDouble(3);
+				double valueTo = rs.getDouble(5);
+				double nominalTo = rs.getDouble(6);
+				double valueToConvert = rs.getDouble(7);
+				double valueAfterConvert =  convertintValutes.convertValultes(valueFrom, nominalForm, valueTo, nominalTo, valueToConvert);
 				
 				// Set rest of information to class
-				historyEntry.setToCharCode(rs.getString("charCodeTo"));
+				historyEntry.setFromCharCode(rs.getString(1));
+				historyEntry.setToCharCode(rs.getString(4));
 				historyEntry.setFromValue(valueToConvert);
-				historyEntry.setFromCharCode(rs.getString("charCodeFrom"));
 				historyEntry.setToValue(valueAfterConvert);
-				historyEntry.setTime(rs.getTime("time").toLocalTime());
-				historyEntry.setDate(rs.getDate("date").toLocalDate());
+				historyEntry.setDate(rs.getDate(8).toLocalDate());
+				historyEntry.setTime(rs.getTime(9).toLocalTime());
 				return historyEntry;
 			}
 			
 		};
 		List<HistoryEntry> history = jdbcTemplate.query(selectHistoryPSCreator, selectHistoryRowMapper);
 		
-		// sort by date
-		history.sort(new Comparator<HistoryEntry>() {
-
-			@Override
-			public int compare(HistoryEntry o1, HistoryEntry o2) {
-				LocalDateTime o1dt = LocalDateTime.of(o1.getDate(), o1.getTime());
-				LocalDateTime o2dt = LocalDateTime.of(o2.getDate(), o2.getTime());
-
-				return o2dt.compareTo(o1dt);
-			}
-
-		});
 		return history;
 	}
 
@@ -186,16 +181,16 @@ public class HistoryEntryJdbcDao {
 	 * @param historyEntry {@code HistoryEntry}
 	 * @param user_id      {@code String}
 	 */
-	public void insertHistoryEntry(HistoryEntry historyEntry, String user_id) {
+	public void insertHistoryEntry(HistoryEntry historyEntry) {
 		jdbcTemplate.update(new PreparedStatementCreator() {
 
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 				PreparedStatement ps = con.prepareStatement(INSERT_HISTORY_ENTRY, Statement.RETURN_GENERATED_KEYS);
-				ps.setInt(1, Integer.parseInt(historyEntry.getFromId()));
-				ps.setInt(2, Integer.parseInt(historyEntry.getToId()));
+				ps.setInt(1, historyEntry.getFromId());
+				ps.setInt(2, historyEntry.getToId());
 				ps.setDouble(3, historyEntry.getFromValue());
-				ps.setInt(4, Integer.parseInt(user_id));
+				ps.setInt(4, historyEntry.getUserId());
 				ps.setDate(5, Date.valueOf(historyEntry.getDate()));
 				ps.setTime(6, Time.valueOf(historyEntry.getTime()));
 				return ps;

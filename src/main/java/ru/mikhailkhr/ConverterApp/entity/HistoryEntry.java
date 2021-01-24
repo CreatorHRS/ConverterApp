@@ -16,11 +16,12 @@ public class HistoryEntry {
 	private double toValue;
 	private LocalTime time;
 	private LocalDate date;
-	private String fromId;
-	private String toId;
+	private int fromId;
+	private int toId;
+	private int userId;
 	
 	public HistoryEntry(String fromCharCode, String toCharCode, double fromValue, double toValue, LocalTime time,
-			LocalDate date, String fromId, String toId) {
+			LocalDate date, int fromId, int toId, int userId) {
 		this.fromCharCode = fromCharCode;
 		this.toCharCode = toCharCode;
 		this.fromValue = fromValue;
@@ -29,17 +30,36 @@ public class HistoryEntry {
 		this.date = date;
 		this.fromId = fromId;
 		this.toId = toId;
+		this.userId = userId;
 	}
-	public String getFromId() {
+	
+	public HistoryEntry(double fromValue, double toValue, LocalTime time,
+			LocalDate date, int fromId, int toId, int userId) {
+		this.fromValue = fromValue;
+		this.toValue = toValue;
+		this.time = time;
+		this.date = date;
+		this.fromId = fromId;
+		this.toId = toId;
+		this.userId = userId;
+	}
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+	public int getFromId() {
 		return fromId;
 	}
-	public void setFromId(String fromId) {
+	public void setFromId(int fromId) {
 		this.fromId = fromId;
 	}
-	public String getToId() {
+	public int getToId() {
 		return toId;
 	}
-	public void setToId(String toId) {
+	public void setToId(int toId) {
 		this.toId = toId;
 	}
 	public HistoryEntry() {

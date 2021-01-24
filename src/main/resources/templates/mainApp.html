@@ -32,25 +32,23 @@
 							<div class="row mt-3">
 								<div class="col-md-6 mx-auto d-grid gap-2">
 									<select name="firstCurency" class="form-select form-select-sm">
-										<option th:if="${ShowResult}" th:value="${fromChar}"
+										<option th:if="${ShowResult}" th:value="${fromNumCode}"
 											th:text="${fromChar}"></option>
 										<option th:if="${ShowResult}" disabled>_________</option>
 
-										<option value="RUB">RUB</option>
 										<option th:each="Valute : ${Valutes}"
-											th:value="${Valute.getCharCode}"
-											th:text="${Valute.getCharCode}"></option>
+											th:value="${Valute.getNumCode}"
+											th:text="${Valute.getCharCode} + ' - ' + ${Valute.getName}"></option>
 									</select>
 								</div>
 								<div class="col-md-6 mx-auto d-grid gap-2">
 									<select name="secondCurency" class="form-select form-select-sm">
-										<option th:if="${ShowResult}" th:value="${toChar}"
+										<option th:if="${ShowResult}" th:value="${toNumCode}"
 											th:text="${toChar}"></option>
 										<option th:if="${ShowResult}" disabled>_________</option>
-										<option value="RUB">RUB</option>
 										<option th:each="Valute : ${Valutes}"
-											th:value="${Valute.getCharCode}"
-											th:text="${Valute.getCharCode}"></option>
+											th:value="${Valute.getNumCode}"
+											th:text="${Valute.getCharCode} + ' - ' + ${Valute.getName}"></option>
 									</select>
 								</div>
 							</div>
@@ -78,7 +76,6 @@
 									</div>
 								</div>
 							</div>
-							<input name="date" th:value="${date}" hidden="true">
 							<div class="row mt-3">
 								<div class="d-grid gap-2 col-6 mx-auto">
 									<button class="btn btn-lg btn-primary " type="submit">Конвертировать</button>

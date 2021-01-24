@@ -22,7 +22,7 @@ import ru.mikhailkhr.ConverterApp.entity.ConverterAppUser;
  */
 @Repository
 public class AppUserJdbcDao {
-	private final String SELECT_USER_BY_EMAIL = "SELECT * FROM my_schema.ConverterAppUser where usermail = ?";
+	private final String SELECT_USER_BY_EMAIL = "SELECT * FROM converterAppSchema.ConverterAppUser where usermail = ?";
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	/**
@@ -46,10 +46,10 @@ public class AppUserJdbcDao {
 			@Override
 			public ConverterAppUser mapRow(ResultSet rs, int rowNum) throws SQLException {
 				ConverterAppUser user = new ConverterAppUser();
-				user.setId(rs.getString("id"));
-				user.setMail(rs.getString("usermail"));
-				user.setName(rs.getString("username"));
-				user.setPass(rs.getString("userpass"));
+				user.setId(rs.getInt(1));
+				user.setName(rs.getString(2));
+				user.setMail(rs.getString(3));
+				user.setPass(rs.getString(4));
 				return user;
 			}
 			

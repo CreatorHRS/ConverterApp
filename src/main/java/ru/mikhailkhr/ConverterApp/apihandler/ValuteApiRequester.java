@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -20,6 +21,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import ru.mikhailkhr.ConverterApp.entity.Valute;
+import ru.mikhailkhr.ConverterApp.entity.ValuteValue;
 
 /**
  * Service that call a api to get Vlutes
@@ -37,60 +39,47 @@ public class ValuteApiRequester {
 	public ValuteApiRequester() {
 	}
 
-	/**
-	 * Method that gets all today valutes using a central bank api
-	 * @return list of valutes
-	 */
-	public List<Valute> getVaulter() {
-		List<Valute> list = new ArrayList<>();
+	public List<ValuteValue> getAllValuteByDate(LocalDate date) 
+	{
+		List<ValuteValue> list = new ArrayList<>();
 		Document doc = null;
-	
+		final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		// making a call	 
 		try {
 			DocumentBuilder builder = factory.newDocumentBuilder();
-			doc = builder.parse(uri);
+			System.out.println("URL =  " + uri + "?date_req=" + date.format(dtf));
+			doc = builder.parse(uri + "?date_req=" + date.format(dtf));
 			doc.getDocumentElement().normalize();
 		} catch (SAXException | IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		// prepare the elements to parse		
 		NodeList elements = doc.getElementsByTagName("Valute");
-		String dateString = doc.getElementsByTagName("ValCurs").item(0).getAttributes().getNamedItem("Date").getTextContent();
-		final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-		final LocalDate date = LocalDate.parse(dateString, dtf);
+		
+		list.add(new ValuteValue( 1.0, 1, date, 643));
 		for (int vaultIndex = 0; vaultIndex < elements.getLength(); vaultIndex++) {
 			NodeList vaultValues = elements.item(vaultIndex).getChildNodes();
-			Valute valute = new Valute();
+			ValuteValue valute = new ValuteValue();
 			
 			valute.setDate(date);
 			for (int valuesIndex = 0; valuesIndex < vaultValues.getLength(); valuesIndex++) {
 				Node valueNode = vaultValues.item(valuesIndex);
 				
 				switch (valueNode.getNodeName()) {
-				case Valute.TAG_NAME_CHAR_CODE: {
-					valute.setCharCode(valueNode.getTextContent());
+				case ValuteValue.TAG_NAME_NUM_CODE: {
+					valute.setValuteNumCode(Integer.parseInt(valueNode.getTextContent()));
 					break;
 				}
-				case Valute.TAG_NAME_NUM_CODE: {
-					valute.setNumCode(valueNode.getTextContent());
-					break;
-				}
-				case Valute.TAG_NAME_NOMINAL: {
+				case ValuteValue.TAG_NAME_NOMINAL: {
 					valute.setNominal(Integer.parseInt(valueNode.getTextContent()));
 					break;
 				}
-				case Valute.TAG_NAME_NAME: {
-					valute.setName(valueNode.getTextContent());
-					break;
-				}
-				case Valute.TAG_NAME_VALUE: {
+				case ValuteValue.TAG_NAME_VALUE: {
 					NumberFormat format = NumberFormat.getInstance(Locale.FRANCE);
-					Number number = null;
+					Number number;
 					try {
 						number = format.parse(valueNode.getTextContent());
 					} catch (ParseException e) {
@@ -106,9 +95,22 @@ public class ValuteApiRequester {
 				}
 
 			}
+			valute.setDate(date);
 			list.add(valute);
 		}
+		
 		return list;
 	}
+	
+	public List<ValuteValue> getAllValuteByDate(List<LocalDate> dates) 
+	{
+		List<ValuteValue> finalList = new LinkedList<ValuteValue>();
+		for (LocalDate date : dates) {
+			finalList.addAll(getAllValuteByDate(date));
+		}
+		return null;
+	}
+	
+	
 
 }

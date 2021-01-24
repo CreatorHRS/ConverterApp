@@ -22,7 +22,7 @@ public class SecurityUser implements UserDetails{
 	private List<SimpleGrantedAuthority> autoritis;
 	
 	
-	public String getId() {
+	public int getId() {
 		return user.getId();
 	}
 	
