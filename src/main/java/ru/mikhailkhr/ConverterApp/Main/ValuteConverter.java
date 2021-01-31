@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 
 import ru.mikhailkhr.ConverterApp.JDBC.HistoryEntryJdbcDao;
 import ru.mikhailkhr.ConverterApp.JDBC.ValuteJdbcDao;
+import ru.mikhailkhr.ConverterApp.Utils.ValutePair;
 import ru.mikhailkhr.ConverterApp.entity.HistoryEntry;
 import ru.mikhailkhr.ConverterApp.entity.Valute;
+import ru.mikhailkhr.ConverterApp.entity.ValuteValue;
 import ru.mikhailkhr.ConverterApp.security.SecurityUser;
 
 /**
@@ -24,7 +26,7 @@ import ru.mikhailkhr.ConverterApp.security.SecurityUser;
 public class ValuteConverter {
 	
 	/**
-	 * Convert the value by char codes and date of last update vlute date 
+	 * Convert the values
 	 * @param convertFromCharCode {@code String} char code form convert
 	 * @param convertToCharCode   {@code String} char code to convert
 	 * @param number              {@code double} value to convert
@@ -34,14 +36,39 @@ public class ValuteConverter {
 	public double convertValultes(double fromValue,  double fromNominal, double toValue, double toNominal, double number) 
 	{	
 		// calculate the convert to value
-		double tempVal = number * fromValue * fromNominal;
-		double result = tempVal / toNominal / toValue;
+		double tempVal = number * (fromValue  / fromNominal);
+		double result = tempVal / (toValue / toNominal);
 		result = Math.round(result * 100.0)/100.0;
-		// create history entry
-		//HistoryEntry historyEntry = new HistoryEntry(convertFromCharCode, convertToCharCode, number, result, LocalTime.now(), LocalDate.now(),fromId, toId);
 		
-		// put history entry to database
-		//historyEntryJdbcDao.insertHistoryEntry(historyEntry, user_id);
 		return result;
+	}
+	
+	/**
+	 * Convert the values
+	 * @param valutePair   {@code ValutePair} pair of valute
+	 * @param number              {@code double} value to convert
+	 * @return
+	 */
+	public double convertValultes(ValutePair valutePair, double number) 
+	{	
+		ValuteValue valueForm = valutePair.getValuteFrom();
+		ValuteValue valueTo = valutePair.getValuteTo();
+		
+		return convertValultes(valueForm.getValue(), valueForm.getNominal(), valueTo.getValue(), valueTo.getNominal(), number);
+	}
+	
+	/**
+	 * Convert the values 
+	 * @param valutePair   {@code ValutePair} pair of valute
+	 * @return
+	 */
+	public double convertValultes(ValutePair valutePair) 
+	{	
+		ValuteValue valueForm = valutePair.getValuteFrom();
+		ValuteValue valueTo = valutePair.getValuteTo();
+		System.out.println("valueForm = " + valueForm);
+		System.out.println("valueTo = " + valueTo);
+		
+		return convertValultes(valueForm.getValue(), valueForm.getNominal(), valueTo.getValue(), valueTo.getNominal(), 1);
 	}
 }

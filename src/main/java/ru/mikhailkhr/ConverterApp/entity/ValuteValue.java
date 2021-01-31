@@ -15,6 +15,11 @@ public class ValuteValue {
 	private int id;
 	private int valuteNumCode;
 	
+	@Override
+	public String toString() {
+		return "Valute '" + valuteNumCode + "' nominal =" + nominal + ", value = " + value;
+	}
+	
 	
 	public ValuteValue(double value, int nominal, LocalDate date, int valuteNumCode, int id) {
 		this.value = value;

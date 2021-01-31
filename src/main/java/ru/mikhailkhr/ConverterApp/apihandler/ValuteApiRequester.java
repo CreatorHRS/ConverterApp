@@ -108,7 +108,7 @@ public class ValuteApiRequester {
 		for (LocalDate date : dates) {
 			finalList.addAll(getAllValuteByDate(date));
 		}
-		return null;
+		return finalList;
 	}
 	
 	

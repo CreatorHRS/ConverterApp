@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import ru.mikhailkhr.ConverterApp.JDBC.HistoryEntryJdbcDao;
 import ru.mikhailkhr.ConverterApp.JDBC.ValuteJdbcDao;
 import ru.mikhailkhr.ConverterApp.JDBC.ValuteValuesJdbcDao;
+import ru.mikhailkhr.ConverterApp.Model.ConverterValuteModel;
+import ru.mikhailkhr.ConverterApp.Model.JsonChartObjectHandler;
+import ru.mikhailkhr.ConverterApp.Utils.Unit;
 import ru.mikhailkhr.ConverterApp.apihandler.ValuteApiRequester;
 import ru.mikhailkhr.ConverterApp.entity.HistoryEntry;
 import ru.mikhailkhr.ConverterApp.entity.Valute;
@@ -61,7 +64,6 @@ public class MainControler {
 		SecurityUser userDetails = (SecurityUser) authentication.getPrincipal();
 		LocalDate todayDate = LocalDate.now();
 		
-		System.out.println("locale = " + request.getLocale().toLanguageTag());
 		// tries to get valutes from database
 		List<Valute> list = valuteJdbcDao.getAllValuteByLocale(request.getLocale());
 		
@@ -160,6 +162,33 @@ public class MainControler {
 		} else {
 			return "redirect:/";
 		}
+
+	}
+	
+	@GetMapping("/chart")
+	public String getChart(HttpServletRequest request, Model model) {
+		String parameters = "?";
+		String dateFrom = request.getParameter("date_from");
+		String dateTo = request.getParameter("date_to");
+		String valuteNumCodeFrom = request.getParameter("valute_from");
+		String valuteNumCodeTo = request.getParameter("valute_to");
+		String unit = request.getParameter("unit");
+		List<Valute> list = valuteJdbcDao.getAllValuteByLocale(request.getLocale());
+		if(dateFrom != null) {
+			parameters += "date_from=" + dateFrom + "&";
+		}
+		if(dateTo != null){
+			parameters += "date_to=" + dateTo+ "&";
+		}if(valuteNumCodeFrom != null) {
+			parameters += "valute_from=" + valuteNumCodeFrom+ "&";
+		}if(valuteNumCodeTo != null) {
+			parameters += "valute_to=" + valuteNumCodeTo+ "&";
+		}if(unit != null) {
+			parameters += "unit=" + unit;
+		}
+		model.addAttribute("chartParameters", parameters);
+		model.addAttribute("Valutes", list);
+		return "chart";
 
 	}
 }
