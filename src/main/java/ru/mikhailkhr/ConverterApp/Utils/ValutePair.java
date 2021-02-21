@@ -2,32 +2,40 @@ package ru.mikhailkhr.ConverterApp.Utils;
 
 import ru.mikhailkhr.ConverterApp.entity.ValuteValue;
 
-public class ValutePair {
-	
+public class ValutePair
+{
+
 	private ValuteValue valuteFrom;
 	private ValuteValue valuteTo;
-	
-	
-	public ValutePair(ValuteValue valuteFrom, ValuteValue valuteTo) {
+
+	public ValutePair(ValuteValue valuteFrom, ValuteValue valuteTo)
+	{
 		this.valuteFrom = valuteFrom;
 		this.valuteTo = valuteTo;
 	}
-	
-	public ValutePair() {
+
+	public ValutePair()
+	{
 	}
-	
-	public ValuteValue getValuteFrom() {
+
+	public ValuteValue getValuteFrom()
+	{
 		return valuteFrom;
 	}
-	public void setValuteFrom(ValuteValue valuteFrom) {
+
+	public void setValuteFrom(ValuteValue valuteFrom)
+	{
 		this.valuteFrom = valuteFrom;
 	}
-	public ValuteValue getValuteTo() {
+
+	public ValuteValue getValuteTo()
+	{
 		return valuteTo;
 	}
-	public void setValuteTo(ValuteValue valuteTo) {
+
+	public void setValuteTo(ValuteValue valuteTo)
+	{
 		this.valuteTo = valuteTo;
 	}
-	
-	
+
 }
