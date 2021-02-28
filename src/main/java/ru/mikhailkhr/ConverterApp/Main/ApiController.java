@@ -34,7 +34,6 @@ public class ApiController
 		int valuteNumCodeFrom = 0;
 		int valuteNumCodeTo = 0;
 		Unit unit = null;
-
 		if(dateFromStr == null)
 		{
 			dateFrom = LocalDate.of(2000, 1, 1);

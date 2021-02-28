@@ -272,6 +272,8 @@ INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
 VALUES (410, 'Won Republic of Korea', 'def');
 INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
 VALUES (392, 'Japanese yen', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (643, 'Russian ruble', 'def');
 
 
 CREATE TABLE converterappschema.historyentries
