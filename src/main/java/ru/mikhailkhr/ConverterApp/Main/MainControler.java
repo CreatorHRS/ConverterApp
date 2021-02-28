@@ -173,6 +173,7 @@ public class MainControler
 	@GetMapping("/chart")
 	public String getChart(HttpServletRequest request, Model model)
 	{
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		String parameters = "?";
 		String dateFrom = request.getParameter("date_from");
 		String dateTo = request.getParameter("date_to");
@@ -202,6 +203,7 @@ public class MainControler
 		}
 		model.addAttribute("chartParameters", parameters);
 		model.addAttribute("Valutes", list);
+		model.addAttribute("maxDate", LocalDate.now().format(formatter));
 		return "chart";
 
 	}

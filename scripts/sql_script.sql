@@ -204,6 +204,75 @@ VALUES (410, 'Вон Республики Корея', 'ru');
 INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
 VALUES (392, 'Японских иен', 'ru');
 
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (036, 'Australian dollar', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (944, 'Azerbaijani manat', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (826, 'Pound sterling', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (051, 'Armenian drams', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (933, 'Belarusian ruble', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (975, 'Bulgarian lev', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (986, 'Brazilian real', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (348, 'Hungarian forints', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (344, 'Hong Kong dollars', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (208, 'Danish krone', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (840, 'U.S. dollar', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (978, 'Euro', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (356, 'Indian rupees', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (398, 'Kazakhstani tenge', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (124, 'Canadian dollar', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (417, 'Kyrgyz soms', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (156, 'CNY', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (498, 'Moldovan lei', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (578, 'Norwegian kroner', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (985, 'Polish zloty', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (946, 'Romanian leu', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (960, 'SDR (Special Drawing Rights)', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (702, 'Singapore dollar', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (972, 'Tajik somoni', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (949, 'Turkish lira', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (934, 'New Turkmen manatт', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (860, 'Uzbek soums', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (980, 'Ukrainian hryvnia', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (203, 'Czech crowns', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (752, 'Swedish crowns', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (756, 'Swiss frank', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (710, 'South African rand', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (410, 'Won Republic of Korea', 'def');
+INSERT INTO converterappschema.valute_info (valute_numcode, info, locale)
+VALUES (392, 'Japanese yen', 'def');
+
 
 CREATE TABLE converterappschema.historyentries
 (

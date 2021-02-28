@@ -39,6 +39,26 @@ public class ValuteJdbcDao
 	public List<Valute> getAllValuteByLocale(Locale locale)
 	{
 
+		String localeTag = locale.toLanguageTag();
+		String localeRegex = "(\\w\\w).*";
+		Pattern pattern = Pattern.compile(localeRegex);
+		Matcher match = pattern.matcher(localeTag);
+		match.find();
+		String language = match.group(1);
+
+		List<Valute> valutes = getAllValuteByLocale(language);
+		return valutes;
+	}
+
+	/**
+	 * Select all valutes from database by locale
+	 *
+	 * @param locale {@code Locale}
+	 * @return list of found valutes
+	 */
+	public List<Valute> getAllValuteByLocale(String locale)
+	{
+
 		// Processing from SQL Injection
 		PreparedStatementCreator selectValutesPSCreator = new PreparedStatementCreator()
 		{
@@ -48,13 +68,7 @@ public class ValuteJdbcDao
 			{
 				PreparedStatement ps = con.prepareStatement(SELECT_VALUTES, Statement.RETURN_GENERATED_KEYS);
 
-				String localeTag = locale.toLanguageTag();
-				String localeRegex = "(\\w\\w).*";
-				Pattern pattern = Pattern.compile(localeRegex);
-				Matcher match = pattern.matcher(localeTag);
-				match.find();
-				String language = match.group(1);
-				ps.setString(1, language);
+				ps.setString(1, locale);
 				return ps;
 			}
 		};
@@ -74,6 +88,10 @@ public class ValuteJdbcDao
 		};
 
 		List<Valute> valutes = jdbcTemplate.query(selectValutesPSCreator, selectValutesRowMapper);
+
+		if(valutes.size() == 0){
+			valutes = getAllValuteByLocale("def");
+		}
 		return valutes;
 	}
 }

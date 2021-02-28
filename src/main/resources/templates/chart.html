@@ -40,7 +40,7 @@
 						<div class="col-md-2"></div>
 						<div class="col-md-2">
 							<label>Выберите дату c</label> <input type="date"
-								min="2000-01-01" name="date_from" class="form-control">
+								min="2000-01-01" th:max="${maxDate}" name="date_from" class="form-control">
 						</div>
 						<div class="col-md-1"></div>
 						<div class="col-md-2">
@@ -66,7 +66,7 @@
 						<div class="col-md-2"></div>
 						<div class="col-md-2">
 							<label>Выберите дату по</label> <input type="date"
-								min="2000-01-01" name="date_to" class="form-control">
+								min="2000-01-02" th:max="${maxDate}" name="date_to" class="form-control">
 						</div>
 						<div class="col-md-1"></div>
 						<div class="col-md-2">

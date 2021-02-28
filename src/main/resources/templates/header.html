@@ -7,12 +7,12 @@
 <body>
 
 	<header th:fragment="header">
-		<!--<div id="name" th:text="'Имя пользователя: ' + ${name}" />
-        <div id="main-menu">
-            <div><a href="/main">Главная</a></div>
-            <div><a href="/history">История</a></div>
-            <div><a href="/logout">Выйдти</a></div>
-        </div>-->
+<!--		<div id="name" th:text="'Имя пользователя: ' + ${name}" />-->
+<!--        <div id="main-menu">-->
+<!--            <div><a href="/main">Главная</a></div>-->
+<!--            <div><a href="/history">История</a></div>-->
+<!--            <div><a href="/logout">Выйдти</a></div>-->
+<!--        </div>-->
 
 		<nav
 			class="navbar navbar-expand-lg navbar-light shadow p-3 mb-5 rounded bg-light">
@@ -35,7 +35,8 @@
 						aria-current="page" href="/main"
 						th:text="#{message.header.menu.label.main}"></a></li>
 					<li class="nav-item"><a class="nav-link active fs-4 fw-bolder"
-						aria-current="page" href="/chart" th:text="CHART"></a></li>
+						aria-current="page" href="/chart"
+						th:text="#{message.header.menu.label.chart}"></a></li>
 					<li class="nav-item"><a class="nav-link active fs-4 fw-bolder"
 						aria-current="page" href="/history"
 						th:text="#{message.header.menu.label.history}"></a></li>
